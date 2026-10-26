@@ -74,11 +74,16 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .ans.right{background:var(--ok-soft);border-color:var(--ok);opacity:1}
 .ans.wrong{background:var(--miss-soft);border-color:var(--miss);opacity:1}
 .strip{display:flex;flex-wrap:wrap;gap:8px}
-.chip{display:flex;flex-direction:column;align-items:center;gap:2px;width:74px;padding:6px 4px;border-radius:12px;background:var(--bg);border:2px solid transparent;font-size:.72rem;font-weight:700;text-align:center;line-height:1.2;position:relative;animation:pop .25s ease-out}
+.chip{display:flex;flex-direction:column;align-items:center;gap:2px;width:74px;padding:6px 4px;border-radius:12px;background:var(--bg);border:2px solid transparent;font-size:.72rem;font-weight:700;text-align:center;line-height:1.2;position:relative;font-family:var(--body);color:var(--ink);cursor:pointer}
+.chip.new{animation:pop .25s ease-out}
+.chip:hover:not(:disabled){border-color:var(--line)}
+.chip:disabled{cursor:default}
+.chip.sel,.chip.sel:hover:not(:disabled){border-color:var(--accent);opacity:1}
 .chip svg{width:40px;height:40px}
 .chip svg *{stroke:var(--ink);stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round;fill:none}
-.chip.later{opacity:.4;animation:none}
+.chip.later{opacity:.4}
 .chip.hit{border-color:var(--ok);background:var(--ok-soft)}
+.chip.hit.sel,.chip.hit.sel:hover:not(:disabled){border-color:var(--accent)}
 .chip .n{position:absolute;top:-8px;right:-6px;background:var(--ok);color:var(--surface);border-radius:99px;width:22px;height:22px;display:grid;place-items:center;font-size:.8rem}
 @keyframes pop{from{transform:scale(.7);opacity:.3}to{transform:scale(1);opacity:1}}
 .verdict{font-family:var(--display);font-size:1.5rem;font-weight:800}
@@ -120,7 +125,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .mark{font-size:.9rem;font-family:var(--body);font-weight:800}
 .mark.ok{color:var(--ok)}.mark.no{color:var(--miss)}
 .note{font-size:.88rem}
-@media (prefers-reduced-motion:reduce){.chip{animation:none}.progress i{transition:none}}
+@media (prefers-reduced-motion:reduce){.chip.new{animation:none}.progress i{transition:none}}
 </style>
 </head><body>
 <div class="wrap" id="app"></div>
@@ -258,7 +263,7 @@ function home(){
 function start(m){S={...S,screen:'play',mode:m,i:0,score:0,res:[],aOk:0,aTot:0,round:makeRound(S.level)};next()}
 function next(){
   if(S.i>=TOTAL){S.screen='end';return render()}
-  S.q=S.round[S.i];S.answered=false;S.picked=null;S.shown=1;S.phase='count';S.deadline=0;S.plan=null;S.planChecked=false;
+  S.q=S.round[S.i];S.answered=false;S.picked=null;S.shown=1;S.view=null;S.popped=0;S.phase='count';S.deadline=0;S.plan=null;S.planChecked=false;
   render();window.scrollTo({top:0});
 }
 const SEEN={qiyam:'berdiri membaca surat',rukuk:'rukuk',itidal:'berdiri bangun dari rukuk',sujud1:'sujud',sujud2:'sujud',duduk:'duduk di antara dua sujud',tasyahud_awal:'duduk tasyahud',tasyahud_akhir:'duduk tasyahud'};
@@ -306,15 +311,19 @@ function play(){
   const done=!ik||S.shown>q.stopAt;
   let body='';
   if(ik){
-    const cur=q.steps[S.shown-1];let c=0;
-    const enough=done&&LEVELS[S.level].hint&&cur.p!=='salam'?'<br><b>Petunjuknya sudah cukup!</b> Gerakan dihentikan, sekarang hitung.':'';
     const shownSteps=S.answered?q.steps:q.steps.slice(0,S.shown);
+    // S.view: gerakan yang diketuk ulang di strip; null = gerakan terkini
+    const vi=S.view!=null&&S.view<shownSteps.length?S.view:S.shown-1,live=vi===S.shown-1;
+    const cur=q.steps[vi];let c=0;
+    const canTap=!(sulit&&!done),pop=S.popped!==S.shown&&!S.answered;S.popped=S.shown;
+    const enough=live&&done&&LEVELS[S.level].hint&&cur.p!=='salam'?'<br><b>Petunjuknya sudah cukup!</b> Gerakan dihentikan, sekarang hitung.':'';
     const f=POS[cur.p].fig;
     body=`${mosque(f,cur.p==='salam'?'berdiri':f,f)}
-    <p class="narr">${narr(q.steps,S.shown-1,done)}${cur.p==='salam'&&!LEVELS[S.level].hint?'':''}${enough}</p>
+    <p class="narr">${live?'':`<span class="tag">Gerakan ke-${vi+1}</span><br>`}${narr(q.steps,vi,live?done:S.answered)}${enough}</p>
     <div class="strip" aria-label="Gerakan imam">${shownSteps.map((s,i)=>{
       const hit=S.answered&&s.p==='rukuk';if(hit)c++;const later=i>=S.shown;
-      return `<div class="chip${hit?' hit':''}${later?' later':''}">${hit?`<span class="n">${c}</span>`:''}${svg(POS[s.p].fig)}${chipLabel(s.p,S.answered)}</div>`}).join('')}</div>
+      return `<button class="chip${hit?' hit':''}${later?' later':''}${i===vi&&(!live||S.view!=null)?' sel':''}${pop&&i===S.shown-1?' new':''}" data-i="${i}" ${canTap?'':'disabled'} aria-pressed="${i===vi}" aria-label="Gerakan ke-${i+1}: ${chipLabel(s.p,S.answered)}">${hit?`<span class="n">${c}</span>`:''}${svg(POS[s.p].fig)}${chipLabel(s.p,S.answered)}</button>`}).join('')}</div>
+    ${canTap&&shownSteps.length>1?`<p class="muted note">${live?'Ketuk gerakan di atas untuk lihat lagi penjelasannya.':'<button class="ghost" id="nowv" style="padding:6px 12px;font-size:.9rem">Kembali ke gerakan terkini</button>'}</p>`:''}
     ${S.answered&&S.shown<q.steps.length?'<p class="muted note">Gerakan yang samar adalah sisa sholat setelah dihentikan.</p>':''}
     ${done?'':(sulit?'<p class="muted">Imam tidak menunggu. Perhatikan terus...</p>':'<button class="primary" id="step">Ikut imam ▶</button>')}`;
   }else{
@@ -352,11 +361,13 @@ function play(){
   ${fb}`;
   document.getElementById('home').onclick=()=>{S.screen='home';render()};
   const st=document.getElementById('step');
-  if(st){st.onclick=()=>{S.shown++;render();const b=document.getElementById('step')||document.getElementById('qa');b&&b.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'});(document.getElementById('step')||b).focus?.({preventScroll:true})}}
-  if(ik&&sulit&&!done){S.t1=setTimeout(()=>{S.shown++;render();const b=document.getElementById('qa');if(b)b.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'})},AUTO)}
+  if(st){st.onclick=()=>{S.shown++;S.view=null;render();const b=document.getElementById('step')||document.getElementById('qa');b&&b.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'});(document.getElementById('step')||b).focus?.({preventScroll:true})}}
+  if(ik&&sulit&&!done){S.t1=setTimeout(()=>{S.shown++;S.view=null;render();const b=document.getElementById('qa');if(b)b.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'})},AUTO)}
   if(canAns&&sulit){S.t2=setInterval(()=>{const left=S.deadline-Date.now();
     if(left<=0){clearT();return answer(-1)}
     const t=document.getElementById('tsec'),b=document.getElementById('tbar');if(t)t.textContent=Math.ceil(left/1000);if(b)b.style.width=(left/TLIMIT*100)+'%'},100)}
+  app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;S.view=S.view===i||(i===S.shown-1&&!S.answered)?null:i;render()});
+  const nv=document.getElementById('nowv');if(nv)nv.onclick=()=>{S.view=null;render()};
   app.querySelectorAll('.ans').forEach(b=>b.onclick=()=>{if(!canAns)return;clearT();answer(+b.dataset.v)});
   const nx=document.getElementById('nx');if(nx)nx.onclick=()=>{S.i++;next()};
   const ta=document.getElementById('toAfter');if(ta)ta.onclick=()=>{S.phase='after';S.plan=Array(q.kurang).fill(null);S.planChecked=false;render();window.scrollTo({top:0})};
