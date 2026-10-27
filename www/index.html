@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Kurang Berapa Rakaatku?</title>
-<meta name="description" content="Latihan masbuk: hitung berapa rakaat yang harus ditambah setelah imam salam.">
+<meta name="description" content="Telat datang ke sholat berjamaah? Hitung berapa rakaat yang harus ditambah setelah imam salam.">
 <meta name="theme-color" content="#0F3B2E">
 <meta property="og:title" content="Kurang Berapa Rakaatku?">
-<meta property="og:description" content="Latihan masbuk: hitung berapa rakaat yang harus ditambah setelah imam salam.">
+<meta property="og:description" content="Telat datang ke sholat berjamaah? Hitung berapa rakaat yang harus ditambah setelah imam salam.">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -66,7 +66,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 /* ---------- Home ---------- */
 .hero{position:relative;border-radius:28px;overflow:hidden;color:#fff;background:#0A2230;box-shadow:var(--shadow)}
 .hero svg.sky{display:block;width:100%;height:auto}
-.hero .txt{position:relative;display:flex;flex-direction:column;gap:8px;padding:4px 22px 22px}
+.hero .txt{position:relative;display:flex;flex-direction:column;gap:8px;padding:12px 22px 22px}
 .hero h1{font-size:clamp(2rem,9vw,2.6rem);font-weight:800}
 .hero p{opacity:.92;max-width:34ch}
 .hero .kicker{display:inline-flex;align-self:flex-start;gap:6px;align-items:center;font-weight:800;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.16);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);padding:4px 10px;border-radius:99px}
@@ -422,7 +422,6 @@ function home(){
     ${skySVG()}
     <button class="icon-btn snd" id="snd" aria-label="${SND.on?'Matikan':'Nyalakan'} suara" aria-pressed="${SND.on}">${SND.on?ICON.sound:ICON.mute}</button>
     <div class="txt">
-      <span class="kicker">Latihan Masbuk</span>
       <h1>Kurang Berapa Rakaatku?</h1>
       <p>Datang telat ke sholat berjamaah? Hitung berapa rakaat yang harus kamu tambah setelah imam salam.</p>
     </div>
@@ -604,7 +603,7 @@ function after(){
 function end(){
   const key=S.mode+'_'+S.level,prev=getBest(key),best=Math.max(prev,S.score);setBest(key,best);
   const stars=S.score===TOTAL?3:S.score>=8?2:S.score>=5?1:0,record=S.score>prev&&S.score>0;
-  const msg=S.score===TOTAL?(S.level==='sulit'?'Sempurna di level Sulit! Kamu siap jadi masbuk yang teliti.':'Sempurna! Coba naik ke level berikutnya.'):S.score>=8?'Bagus! Sedikit lagi sempurna.':'Ayo latihan lagi. Ingat: hitung rukuk bareng imam.';
+  const msg=S.score===TOTAL?(S.level==='sulit'?'Sempurna di level Sulit! Kamu sudah jago menghitung rakaat.':'Sempurna! Coba naik ke level berikutnya.'):S.score>=8?'Bagus! Sedikit lagi sempurna.':'Ayo latihan lagi. Ingat: hitung rukuk bareng imam.';
   const rows=PRAYERS.map(pr=>{const r=S.res.filter(x=>x.name===pr.name);
     return `<div class="rrow"><span class="pi t-${pr.name}">${picon(pr.name,'')}</span><span>${pr.name}</span><span class="rd">${r.map(x=>`<i class="${x.ok?'d-ok':'d-no'}" title="${x.ok?'benar':'salah'}">${x.ok?ICON.tick:ICON.cross}</i>`).join('')}</span><span class="muted">${r.filter(x=>x.ok).length}/${r.length}</span></div>`}).join('');
   const nextLv=S.score>=8&&S.level!=='sulit'?(S.level==='mudah'?'sedang':'sulit'):null;

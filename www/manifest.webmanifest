@@ -1,7 +1,7 @@
 {
   "name": "Kurang Berapa Rakaatku?",
   "short_name": "Rakaatku",
-  "description": "Latihan masbuk: hitung berapa rakaat yang harus ditambah setelah imam salam.",
+  "description": "Telat datang ke sholat berjamaah? Hitung berapa rakaat yang harus ditambah setelah imam salam.",
   "lang": "id",
   "start_url": "./",
   "scope": "./",

@@ -1,6 +1,6 @@
 # Kurang Berapa Rakaatku?
 
-Game latihan **masbuk**: datang telat ke sholat berjamaah, hitung berapa rakaat yang harus ditambah setelah imam salam.
+Game edukasi: kalau telat datang ke sholat berjamaah, hitung berapa rakaat yang harus ditambah setelah imam salam.
 
 - **Main di browser:** https://puntadewaitb.github.io/sholatku/
 - **Unduh APK Android:** https://github.com/Puntadewaitb/sholatku/releases/latest/download/rakaatku.apk

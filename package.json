@@ -2,7 +2,7 @@
   "name": "sholatku",
   "version": "1.0.0",
   "private": true,
-  "description": "Kurang Berapa Rakaatku? - latihan masbuk",
+  "description": "Kurang Berapa Rakaatku? - hitung rakaat yang harus ditambah setelah imam salam",
   "scripts": {
     "sync": "cap sync android",
     "icons": "capacitor-assets generate --android"
