@@ -1,0 +1,10 @@
+{
+  "appId": "id.sholatku.rakaat",
+  "appName": "Kurang Berapa Rakaatku?",
+  "webDir": "www",
+  "backgroundColor": "#0F3B2E",
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}
